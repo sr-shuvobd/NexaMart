@@ -46,7 +46,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (session?.user?.id) {
-      fetch(`http://localhost:5000/api/users/${session.user.id}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${session.user.id}`)
         .then(res => res.json())
         .then(data => {
           if (data.success && data.user.addresses && data.user.addresses.length > 0) {

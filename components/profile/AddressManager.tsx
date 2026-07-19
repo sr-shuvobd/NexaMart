@@ -30,7 +30,7 @@ export default function AddressManager() {
 
   const fetchAddresses = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${session?.user?.id}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${session?.user?.id}`);
       const data = await res.json();
       if (data.success && data.user.addresses) {
         setAddresses(data.user.addresses);
@@ -44,7 +44,7 @@ export default function AddressManager() {
 
   const saveAddresses = async (newAddresses: Address[]) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${session?.user?.id}/addresses`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${session?.user?.id}/addresses`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ addresses: newAddresses })

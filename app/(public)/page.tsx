@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 async function getAdminStats() {
   try {
-    const res = await fetch("http://localhost:5000/api/stats/admin", { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stats/admin`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.success ? data.stats : null;
@@ -18,7 +18,7 @@ async function getAdminStats() {
 
 async function getFeaturedProduct() {
   try {
-    const res = await fetch("http://localhost:5000/api/products?limit=1", { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?limit=1`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.success && data.products.length > 0 ? data.products[0] : null;

@@ -3,6 +3,5 @@
   "/(public)/explore/page": "app/(public)/explore/page.js",
   "/(public)/login/page": "app/(public)/login/page.js",
   "/(public)/register/page": "app/(public)/register/page.js",
-  "/api/auth/[...all]/route": "app/api/auth/[...all]/route.js",
   "/seller/add-product/page": "app/seller/add-product/page.js"
 }

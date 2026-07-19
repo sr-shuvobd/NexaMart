@@ -5,7 +5,7 @@ import ProductActions from "@/components/product/ProductActions";
 
 async function getProduct(id: string) {
   try {
-    const res = await fetch(`http://localhost:5000/api/products/${id}`, { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, { cache: "no-store" });
     if (!res.ok) return null;
     const data = await res.json();
     return data.success ? data.product : null;
