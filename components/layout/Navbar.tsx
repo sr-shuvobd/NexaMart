@@ -118,6 +118,7 @@ export default function Navbar() {
     await signOut({
       fetchOptions: {
         onSuccess: () => {
+          localStorage.removeItem("nexamart_jwt");
           window.location.href = "/login";
         },
       },

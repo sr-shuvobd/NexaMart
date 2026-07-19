@@ -18,6 +18,7 @@ export default function AdminNavigation() {
     await signOut({
       fetchOptions: {
         onSuccess: () => {
+          localStorage.removeItem("nexamart_jwt");
           window.location.href = "/login";
         },
       },

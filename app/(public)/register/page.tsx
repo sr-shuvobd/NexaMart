@@ -277,7 +277,7 @@ export default function RegisterPage() {
               <div className="relative z-10 flex gap-3">
                 <button 
                   type="button" 
-                  onClick={() => signIn.social({ provider: "google" })}
+                  onClick={() => signIn.social({ provider: "google", callbackURL: "/" })}
                   className="btn-outline w-full !py-2 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center justify-center gap-2 text-sm"
                 >
                   <svg viewBox="0 0 24 24" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
