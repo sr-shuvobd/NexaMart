@@ -66,8 +66,8 @@ function ThemeToggle() {
               key={value}
               onClick={() => { setTheme(value as "light" | "dark" | "system"); setOpen(false); }}
               className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm transition-colors ${theme === value
-                  ? "text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 font-medium"
-                  : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+                ? "text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 font-medium"
+                : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"
                 }`}
             >
               <Icon size={14} />
@@ -128,8 +128,8 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-            ? "bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-subtle border-b border-neutral-200/50 dark:border-neutral-800/50 py-3"
-            : "bg-white dark:bg-black border-b border-transparent py-4"
+          ? "bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-subtle border-b border-neutral-200/50 dark:border-neutral-800/50 py-3"
+          : "bg-white dark:bg-black border-b border-transparent py-4"
           }`}
       >
         <div className="max-w-[1280px] mx-auto px-6 md:px-8 flex items-center justify-between">
@@ -179,8 +179,8 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   className={`text-sm font-medium transition-colors ${pathname === link.href
-                      ? "text-neutral-900 dark:text-white"
-                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    ? "text-neutral-900 dark:text-white"
+                    : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                     }`}
                 >
                   {link.name}
@@ -243,7 +243,7 @@ export default function Navbar() {
                         <p className="text-xs text-neutral-500 truncate">{session.user.email}</p>
                       </div>
                       <Link
-                        href={(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "/admin" : "/profile"}
+                        href={(session.user as any).role === "admin" ? "/admin" : (session.user as any).role === "seller" ? "/seller" : "/profile"}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
                       >
@@ -334,7 +334,7 @@ export default function Navbar() {
                       <p className="text-xs text-neutral-500">{session.user.email}</p>
                     </div>
                   </div>
-                  <Link href={(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "/admin" : "/profile"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
+                  <Link href={(session.user as any).role === "admin" ? "/admin" : (session.user as any).role === "seller" ? "/seller" : "/profile"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
                     <LayoutDashboard size={16} />
                     {(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "Dashboard" : "Profile"}
                   </Link>

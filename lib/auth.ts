@@ -19,6 +19,14 @@ export const auth = betterAuth({
         required: false,
         defaultValue: "user",
       },
+      storeName: {
+        type: "string",
+        required: false,
+      },
+      phone: {
+        type: "string",
+        required: false,
+      },
     },
   },
   trustedOrigins: [

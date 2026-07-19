@@ -22,7 +22,7 @@ export default function RegisterPage() {
   // Redirect if already logged in
   if (session?.user) {
     const userRole = (session.user as any)?.role;
-    window.location.href = (userRole === "admin" || userRole === "seller") ? "/admin" : "/";
+    window.location.href = userRole === "admin" ? "/admin" : userRole === "seller" ? "/seller" : "/";
     return null;
   }
 
@@ -37,15 +37,22 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      const signUpData: any = {
+        email,
+        password,
+        name,
+        role: isSeller ? "seller" : "user"
+      };
+
+      if (isSeller) {
+        signUpData.storeName = storeName;
+        signUpData.phone = phone;
+      }
+
       const res = await fetch("/api/auth/sign-up/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email, 
-          password, 
-          name,
-          role: isSeller ? "seller" : "user"
-        }),
+        body: JSON.stringify(signUpData),
       });
 
       const data = await res.json();
@@ -81,22 +88,20 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setIsSeller(false)}
-              className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-all ${
-                !isSeller
+              className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-all ${!isSeller
                   ? "bg-white dark:bg-[#0a0a0a] text-neutral-900 dark:text-white shadow-sm"
                   : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-              }`}
+                }`}
             >
               Shopper
             </button>
             <button
               type="button"
               onClick={() => setIsSeller(true)}
-              className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-all ${
-                isSeller
+              className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-all ${isSeller
                   ? "bg-white dark:bg-[#0a0a0a] text-neutral-900 dark:text-white shadow-sm"
                   : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
-              }`}
+                }`}
             >
               Seller
             </button>

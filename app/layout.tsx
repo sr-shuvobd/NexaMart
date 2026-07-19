@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import { ThemeProvider } from "@/providers/ThemeProvider";
-import ToastProvider from "@/components/providers/ToastProvider";
+import RootLayoutClient from "@/components/layout/RootLayoutClient";
 import "./globals.css";
 
 const inter = Inter({
@@ -45,14 +42,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-white`}>
-        <ThemeProvider>
-          <ToastProvider />
-          <Navbar />
-          <main className="flex-1 pt-[64px]">
-            {children}
-          </main>
-          <Footer />
-        </ThemeProvider>
+        <RootLayoutClient>
+          {children}
+        </RootLayoutClient>
       </body>
     </html>
   );

@@ -6,6 +6,7 @@ import {
   ChevronDown, Grid2x2, List, Sparkles, Tag,
   Laptop, Shirt, Home, BookOpen, Dumbbell, Baby
 } from "lucide-react";
+import { toast } from "react-toastify";
 
 const categories = [
   { id: "all", name: "All Products", icon: Sparkles },
@@ -37,6 +38,23 @@ export default function ExplorePage() {
   const [gridView, setGridView] = useState(true);
   const [wishlist, setWishlist] = useState<number[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleWishlist = (id: number, name: string) => {
+    setWishlist(p => {
+      const exists = p.includes(id);
+      if (exists) {
+        toast.info(`Removed ${name} from Wishlist`);
+        return p.filter(i => i !== id);
+      } else {
+        toast.success(`Added ${name} to Wishlist!`);
+        return [...p, id];
+      }
+    });
+  };
+
+  const handleAddToCart = (name: string) => {
+    toast.success(`Added ${name} to Cart!`);
+  };
 
   const filtered = useMemo(() => {
     let items = products.filter((p) => {
@@ -197,7 +215,7 @@ export default function ExplorePage() {
                         </span>
                       )}
                       <button
-                        onClick={() => setWishlist(p => p.includes(product.id) ? p.filter(i => i !== product.id) : [...p, product.id])}
+                        onClick={() => toggleWishlist(product.id, product.name)}
                         className={`absolute top-3 right-3 p-1.5 rounded-full bg-white dark:bg-black border transition-colors shadow-sm ${wishlist.includes(product.id) ? "border-red-200 text-red-500" : "border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                       >
                         <Heart size={14} className={wishlist.includes(product.id) ? "fill-current" : ""} />
@@ -212,7 +230,10 @@ export default function ExplorePage() {
                       </div>
                       <div className="mt-auto flex items-center justify-between pt-2">
                         <span className="text-sm font-semibold text-neutral-900 dark:text-white">${product.price}</span>
-                        <button className="text-xs font-medium bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white px-3 py-1.5 rounded-md transition-colors">
+                        <button 
+                          onClick={() => handleAddToCart(product.name)}
+                          className="text-xs font-medium bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white px-3 py-1.5 rounded-md transition-colors"
+                        >
                           Add
                         </button>
                       </div>
@@ -233,12 +254,15 @@ export default function ExplorePage() {
                     </div>
                     <div className="flex flex-col justify-between items-end">
                       <button
-                        onClick={() => setWishlist(p => p.includes(product.id) ? p.filter(i => i !== product.id) : [...p, product.id])}
+                        onClick={() => toggleWishlist(product.id, product.name)}
                         className={`p-1.5 rounded-full border transition-colors ${wishlist.includes(product.id) ? "border-red-200 text-red-500 bg-red-50 dark:bg-red-900/10" : "border-transparent text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"}`}
                       >
                         <Heart size={16} className={wishlist.includes(product.id) ? "fill-current" : ""} />
                       </button>
-                      <button className="text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-black px-4 py-2 rounded-md hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">
+                      <button 
+                        onClick={() => handleAddToCart(product.name)}
+                        className="text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-black px-4 py-2 rounded-md hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
+                      >
                         Add to Cart
                       </button>
                     </div>

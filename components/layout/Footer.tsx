@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Github, Twitter, Linkedin } from "lucide-react";
 
 const footerLinks = [
@@ -32,6 +35,9 @@ const footerLinks = [
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/admin") || pathname.startsWith("/seller")) return null;
 
   return (
     <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black pt-16 pb-8">

@@ -17,7 +17,7 @@ export default function LoginPage() {
   // Redirect if already logged in
   if (session?.user) {
     const role = (session.user as any)?.role;
-    window.location.href = (role === "admin" || role === "seller") ? "/admin" : "/";
+    window.location.href = role === "admin" ? "/admin" : role === "seller" ? "/seller" : "/";
     return null;
   }
 
@@ -38,11 +38,13 @@ export default function LoginPage() {
         toast.error(data.message || "Login failed. Please try again.");
       } else {
         toast.success("Welcome back! Redirecting...");
-        
+
         // Redirect based on role
         const role = (data.user as any)?.role;
-        if (role === "seller" || role === "admin") {
+        if (role === "admin") {
           setTimeout(() => { window.location.href = "/admin"; }, 1000);
+        } else if (role === "seller") {
+          setTimeout(() => { window.location.href = "/seller"; }, 1000);
         } else {
           setTimeout(() => { window.location.href = "/"; }, 1000);
         }
