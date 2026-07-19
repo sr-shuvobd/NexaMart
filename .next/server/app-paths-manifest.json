@@ -1,11 +1,10 @@
 {
-  "/(public)/page": "app/(public)/page.js",
-  "/api/auth/[...all]/route": "app/api/auth/[...all]/route.js",
   "/(public)/login/page": "app/(public)/login/page.js",
+  "/api/auth/[...all]/route": "app/api/auth/[...all]/route.js",
+  "/(public)/register/page": "app/(public)/register/page.js",
+  "/(public)/page": "app/(public)/page.js",
   "/(public)/explore/page": "app/(public)/explore/page.js",
-  "/(public)/contact/page": "app/(public)/contact/page.js",
-  "/(public)/about/page": "app/(public)/about/page.js",
+  "/(public)/products/[id]/page": "app/(public)/products/[id]/page.js",
   "/seller/page": "app/seller/page.js",
-  "/(protected)/cart/page": "app/(protected)/cart/page.js",
-  "/(protected)/checkout/page": "app/(protected)/checkout/page.js"
+  "/(protected)/cart/page": "app/(protected)/cart/page.js"
 }

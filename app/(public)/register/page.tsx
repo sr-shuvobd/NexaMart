@@ -17,6 +17,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [storeName, setStoreName] = useState("");
   const [phone, setPhone] = useState("");
+  const [image, setImage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const { data: session } = useSession();
 
   // Redirect if already logged in
@@ -41,6 +43,7 @@ export default function RegisterPage() {
         email,
         password,
         name,
+        image,
         role: isSeller ? "seller" : "user"
       };
 
@@ -67,6 +70,33 @@ export default function RegisterPage() {
       toast.error("Something went wrong. Please check your connection.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=4983d5f47f26efc3e85064efe6b1a73c`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setImage(data.data.url);
+        toast.success("Profile picture uploaded!");
+      } else {
+        toast.error("Failed to upload image.");
+      }
+    } catch {
+      toast.error("Error uploading image.");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -108,6 +138,31 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleRegister} className="relative z-10 space-y-4">
+            
+            <div className="flex flex-col items-center justify-center mb-4">
+              <label className="relative cursor-pointer group">
+                <div className={`w-20 h-20 rounded-full overflow-hidden border-2 flex items-center justify-center transition-colors ${image ? 'border-primary-500' : 'border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}>
+                  {uploadingImage ? (
+                    <span className="w-5 h-5 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin" />
+                  ) : image ? (
+                    <img src={image} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center text-neutral-400">
+                      <User size={24} />
+                      <span className="text-[10px] mt-1 font-medium">Upload</span>
+                    </div>
+                  )}
+                </div>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                />
+              </label>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Full name</label>
               <div className="relative">

@@ -1,21 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
-
-const initialProducts = [
-  { id: "PRD-501", name: "Wireless Charging Pad", category: "Electronics", price: "$29.99", stock: 80, status: "Active" },
-  { id: "PRD-502", name: "Ergonomic Office Chair", category: "Home", price: "$199.99", stock: 15, status: "Active" },
-  { id: "PRD-503", name: "Bluetooth Sports Earbuds", category: "Electronics", price: "$49.99", stock: 0, status: "Out of Stock" },
-];
+import { Plus, Search, Edit, Trash2, Package, RefreshCw } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
+import { toast } from "react-toastify";
+import api from "@/lib/axios";
 
 export default function SellerProductsPage() {
-  const [products, setProducts] = useState(initialProducts);
+  const { data: session } = useSession();
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
-  const handleDelete = (id: string) => {
-    setProducts(products.filter(p => p.id !== id));
+  const fetchProducts = async () => {
+    if (!session?.user?.id) return;
+    setLoading(true);
+    try {
+      const res = await api.get(`/api/products/seller/${session.user.id}`);
+      if (res.data.success) {
+        setProducts(res.data.products);
+      }
+    } catch {
+      toast.error("Failed to load products.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchProducts();
+    }
+  }, [session]);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+    try {
+      const res = await api.delete(`/api/products/${id}`);
+      if (res.data.success) {
+        setProducts(products.filter((p) => p._id !== id));
+        toast.success("Product deleted.");
+      }
+    } catch {
+      toast.error("Failed to delete product.");
+    }
+  };
+
+  const filtered = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -34,63 +68,95 @@ export default function SellerProductsPage() {
           <Search size={16} className="text-neutral-400" />
           <input 
             type="text" 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search my products..." 
             className="bg-transparent border-none outline-none text-sm text-neutral-900 dark:text-white placeholder-neutral-500 w-full sm:w-64"
           />
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-800">
-              <tr>
-                <th className="px-6 py-4 font-medium text-neutral-500">Product Name</th>
-                <th className="px-6 py-4 font-medium text-neutral-500">Category</th>
-                <th className="px-6 py-4 font-medium text-neutral-500">Price</th>
-                <th className="px-6 py-4 font-medium text-neutral-500">Stock</th>
-                <th className="px-6 py-4 font-medium text-neutral-500">Status</th>
-                <th className="px-6 py-4 font-medium text-neutral-500 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-              {products.map((product) => (
-                <tr key={product.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-900/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-neutral-900 dark:text-white">{product.name}</p>
-                    <p className="text-xs text-neutral-500">{product.id}</p>
-                  </td>
-                  <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300">{product.category}</td>
-                  <td className="px-6 py-4 text-neutral-900 dark:text-white font-medium">{product.price}</td>
-                  <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300">{product.stock}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      product.status === 'Active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                    }`}>
-                      {product.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors" title="Edit">
-                        <Edit size={16} />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(product.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors" 
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading ? (
+        <div className="card-base p-16 flex flex-col items-center justify-center text-center">
+          <RefreshCw size={28} className="animate-spin text-primary-500 mb-4" />
+          <p className="text-neutral-500">Loading your products...</p>
         </div>
-      </div>
+      ) : filtered.length === 0 ? (
+        <div className="card-base p-16 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center mb-4">
+            <Package size={28} className="text-neutral-300 dark:text-neutral-700" />
+          </div>
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-white mb-2">No products found</h2>
+          <p className="text-neutral-500 max-w-sm mb-6">
+            {search ? "No products match your search." : "You haven't added any products yet. Get started by adding your first product!"}
+          </p>
+          {!search && (
+            <Link href="/seller/add-product" className="btn-primary py-2 px-4 flex items-center gap-2">
+              <Plus size={16} /> Add Your First Product
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-800">
+                <tr>
+                  <th className="px-6 py-4 font-medium text-neutral-500">Product</th>
+                  <th className="px-6 py-4 font-medium text-neutral-500">Category</th>
+                  <th className="px-6 py-4 font-medium text-neutral-500">Price</th>
+                  <th className="px-6 py-4 font-medium text-neutral-500">Stock</th>
+                  <th className="px-6 py-4 font-medium text-neutral-500">Status</th>
+                  <th className="px-6 py-4 font-medium text-neutral-500 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                {filtered.map((product) => (
+                  <tr key={product._id} className="hover:bg-neutral-50 dark:hover:bg-neutral-900/30 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-900 shrink-0">
+                          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-neutral-900 dark:text-white">{product.name}</p>
+                          <p className="text-xs text-neutral-500">{product._id.slice(-8).toUpperCase()}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300 capitalize">{product.category}</td>
+                    <td className="px-6 py-4 text-neutral-900 dark:text-white font-medium">${product.price}</td>
+                    <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300">{product.stock}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        product.status === 'Active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                        product.status === 'Draft' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      }`}>
+                        {product.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors" title="Edit">
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(product._id)}
+                          className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors" 
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

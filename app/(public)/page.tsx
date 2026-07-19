@@ -1,7 +1,34 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield, Search, TrendingUp, Users, ShoppingBag, Star, Package, Smile } from "lucide-react";
 
-export default function HomePage() {
+export const dynamic = 'force-dynamic';
+
+async function getAdminStats() {
+  try {
+    const res = await fetch("http://localhost:5000/api/stats/admin", { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success ? data.stats : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function getFeaturedProduct() {
+  try {
+    const res = await fetch("http://localhost:5000/api/products?limit=1", { cache: "no-store" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success && data.products.length > 0 ? data.products[0] : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export default async function HomePage() {
+  const stats = await getAdminStats();
+  const featuredProduct = await getFeaturedProduct();
+
   return (
     <div className="flex flex-col overflow-hidden">
       {/* ── STUNNING HERO SECTION ── */}
@@ -90,12 +117,16 @@ export default function HomePage() {
               {/* Floating Glass Card 2 - Mini Product */}
               <div className="absolute -top-6 -right-6 lg:-right-8 glass rounded-2xl p-3 border border-white/40 dark:border-white/10 shadow-xl animate-float" style={{ animationDelay: '1.5s' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80" alt="Product" className="w-full h-full object-cover" />
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+                    <img src={featuredProduct?.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80"} alt="Featured Product" className="w-full h-full object-cover" />
                   </div>
                   <div className="pr-2">
-                    <p className="text-xs font-bold text-neutral-900 dark:text-white">Nike Air Max</p>
-                    <p className="text-xs font-semibold text-primary-500 mt-0.5">$129.00</p>
+                    <p className="text-xs font-bold text-neutral-900 dark:text-white max-w-[120px] truncate">
+                      {featuredProduct?.name || "Premium Sneakers"}
+                    </p>
+                    <p className="text-xs font-semibold text-primary-500 mt-0.5">
+                      ${featuredProduct?.price || "129.00"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -178,8 +209,8 @@ export default function HomePage() {
         <div className="section-container !py-0">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: Users, value: "50K+", label: "Active Shoppers", color: "text-blue-500" },
-              { icon: Package, value: "100K+", label: "Products Shipped", color: "text-primary-500" },
+              { icon: Users, value: stats?.totalOrders > 0 ? `${Math.max(10, stats.totalOrders * 2)}+` : "50K+", label: "Active Shoppers", color: "text-blue-500" },
+              { icon: Package, value: stats?.totalOrders ? `${stats.totalOrders}` : "100K+", label: "Products Shipped", color: "text-primary-500" },
               { icon: Star, value: "4.9/5", label: "Average Rating", color: "text-amber-500" },
               { icon: Smile, value: "99.8%", label: "Satisfaction Rate", color: "text-pink-500" }
             ].map((stat, i) => (

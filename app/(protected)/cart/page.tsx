@@ -1,28 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 
-const initialCart = [
-  { id: 1, name: "Apple AirPods Pro (2nd Gen)", price: 249, quantity: 1, image: "https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&q=80" },
-  { id: 4, name: "Sony WH-1000XM5 Headphones", price: 328, quantity: 1, image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=400&q=80" },
-];
-
 export default function CartPage() {
-  const [cart, setCart] = useState(initialCart);
+  const [cart, setCart] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  const updateQuantity = (id: number, delta: number) => {
-    setCart(cart.map(item => item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item));
+  useEffect(() => {
+    const savedCart = localStorage.getItem("nexamart_cart");
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    setLoaded(true);
+  }, []);
+
+  const saveCart = (newCart: any[]) => {
+    setCart(newCart);
+    localStorage.setItem("nexamart_cart", JSON.stringify(newCart));
   };
 
-  const removeItem = (id: number) => {
-    setCart(cart.filter(item => item.id !== id));
+  const updateQuantity = (id: string, delta: number) => {
+    const newCart = cart.map(item => 
+      (item.id === id || item._id === id) 
+        ? { ...item, quantity: Math.max(1, item.quantity + delta) } 
+        : item
+    );
+    saveCart(newCart);
+  };
+
+  const removeItem = (id: string) => {
+    const newCart = cart.filter(item => item.id !== id && item._id !== id);
+    saveCart(newCart);
   };
 
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const tax = subtotal * 0.08;
   const total = subtotal + tax;
+
+  if (!loaded) return null; // Avoid hydration mismatch
 
   return (
     <div className="min-h-[80vh] bg-neutral-50 dark:bg-[#0a0a0a] py-12 px-6">
@@ -47,7 +68,7 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
               {cart.map(item => (
-                <div key={item.id} className="card-base p-4 sm:p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center relative group">
+                <div key={item.id || item._id} className="card-base p-4 sm:p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center relative group">
                   <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-900 shrink-0">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
@@ -57,15 +78,15 @@ export default function CartPage() {
                   </div>
                   <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                     <div className="flex items-center bg-neutral-100 dark:bg-neutral-900 rounded-lg p-1 border border-neutral-200 dark:border-neutral-800">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-white dark:hover:bg-neutral-800 rounded-md transition-colors">
+                      <button onClick={() => updateQuantity(item.id || item._id, -1)} className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-white dark:hover:bg-neutral-800 rounded-md transition-colors">
                         <Minus size={14} />
                       </button>
                       <span className="w-10 text-center text-sm font-semibold text-neutral-900 dark:text-white">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-white dark:hover:bg-neutral-800 rounded-md transition-colors">
+                      <button onClick={() => updateQuantity(item.id || item._id, 1)} className="p-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-white dark:hover:bg-neutral-800 rounded-md transition-colors">
                         <Plus size={14} />
                       </button>
                     </div>
-                    <button onClick={() => removeItem(item.id)} className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors" aria-label="Remove item">
+                    <button onClick={() => removeItem(item.id || item._id)} className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors" aria-label="Remove item">
                       <Trash2 size={18} />
                     </button>
                   </div>
