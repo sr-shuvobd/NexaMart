@@ -5,12 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, ArrowRight, Github } from "lucide-react";
 import { toast } from "react-toastify";
+import { useSession } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
+
+  // Redirect if already logged in
+  if (session?.user) {
+    const role = (session.user as any)?.role;
+    window.location.href = (role === "admin" || role === "seller") ? "/admin" : "/";
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +40,8 @@ export default function LoginPage() {
         toast.success("Welcome back! Redirecting...");
         
         // Redirect based on role
-        if (data.user?.role === "seller") {
+        const role = (data.user as any)?.role;
+        if (role === "seller" || role === "admin") {
           setTimeout(() => { window.location.href = "/admin"; }, 1000);
         } else {
           setTimeout(() => { window.location.href = "/"; }, 1000);

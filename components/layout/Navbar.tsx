@@ -13,19 +13,19 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { useSession, signOut } from "@/lib/auth-client";
 
 const categories = [
-  { id: "electronics", name: "Electronics",   icon: Laptop,    href: "/explore?cat=electronics" },
-  { id: "fashion",     name: "Fashion",        icon: Shirt,     href: "/explore?cat=fashion" },
-  { id: "home",        name: "Home & Living",  icon: Home,      href: "/explore?cat=home" },
-  { id: "books",       name: "Books",          icon: BookOpen,  href: "/explore?cat=books" },
-  { id: "sports",      name: "Sports",         icon: Dumbbell,  href: "/explore?cat=sports" },
-  { id: "kids",        name: "Baby & Kids",    icon: Baby,      href: "/explore?cat=kids" },
-  { id: "deals",       name: "Deals",          icon: Tag,       href: "/explore?cat=deals" },
-  { id: "all",         name: "All Categories", icon: LayoutGrid,href: "/explore" },
+  { id: "electronics", name: "Electronics", icon: Laptop, href: "/explore?cat=electronics" },
+  { id: "fashion", name: "Fashion", icon: Shirt, href: "/explore?cat=fashion" },
+  { id: "home", name: "Home & Living", icon: Home, href: "/explore?cat=home" },
+  { id: "books", name: "Books", icon: BookOpen, href: "/explore?cat=books" },
+  { id: "sports", name: "Sports", icon: Dumbbell, href: "/explore?cat=sports" },
+  { id: "kids", name: "Baby & Kids", icon: Baby, href: "/explore?cat=kids" },
+  { id: "deals", name: "Deals", icon: Tag, href: "/explore?cat=deals" },
+  { id: "all", name: "All Categories", icon: LayoutGrid, href: "/explore" },
 ];
 
 const navLinks = [
   { name: "Explore", href: "/explore" },
-  { name: "About",   href: "/about" },
+  { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -43,8 +43,8 @@ function ThemeToggle() {
   }, []);
 
   const options = [
-    { value: "light",  label: "Light",  Icon: Sun },
-    { value: "dark",   label: "Dark",   Icon: Moon },
+    { value: "light", label: "Light", Icon: Sun },
+    { value: "dark", label: "Dark", Icon: Moon },
     { value: "system", label: "System", Icon: Monitor },
   ];
 
@@ -65,11 +65,10 @@ function ThemeToggle() {
             <button
               key={value}
               onClick={() => { setTheme(value as "light" | "dark" | "system"); setOpen(false); }}
-              className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm transition-colors ${
-                theme === value
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm transition-colors ${theme === value
                   ? "text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 font-medium"
                   : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-              }`}
+                }`}
             >
               <Icon size={14} />
               {label}
@@ -82,13 +81,13 @@ function ThemeToggle() {
 }
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled]     = useState(false);
-  const [mobileOpen, setMobileOpen]     = useState(false);
-  const [catOpen, setCatOpen]           = useState(false);
-  const [searchQuery, setSearchQuery]   = useState("");
-  const [profileOpen, setProfileOpen]   = useState(false);
-  const pathname  = usePathname();
-  const catRef    = useRef<HTMLDivElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false);
+  const pathname = usePathname();
+  const catRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const { data: session, isPending } = useSession();
@@ -128,14 +127,13 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
             ? "bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-subtle border-b border-neutral-200/50 dark:border-neutral-800/50 py-3"
             : "bg-white dark:bg-black border-b border-transparent py-4"
-        }`}
+          }`}
       >
         <div className="max-w-[1280px] mx-auto px-6 md:px-8 flex items-center justify-between">
-          
+
           <div className="flex items-center gap-8">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 shrink-0">
@@ -151,9 +149,8 @@ export default function Navbar() {
                   onClick={() => setCatOpen(!catOpen)}
                   aria-haspopup="true"
                   aria-expanded={catOpen}
-                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                    catOpen ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                  }`}
+                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${catOpen ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                    }`}
                 >
                   Categories
                   <ChevronDown size={14} className={`transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`} />
@@ -181,11 +178,10 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === link.href
+                  className={`text-sm font-medium transition-colors ${pathname === link.href
                       ? "text-neutral-900 dark:text-white"
                       : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                  }`}
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -247,12 +243,12 @@ export default function Navbar() {
                         <p className="text-xs text-neutral-500 truncate">{session.user.email}</p>
                       </div>
                       <Link
-                        href={session.user.role === "seller" ? "/admin" : "/profile"}
+                        href={(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "/admin" : "/profile"}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
                       >
                         <LayoutDashboard size={14} />
-                        {session.user.role === "seller" ? "Dashboard" : "Profile"}
+                        {(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "Dashboard" : "Profile"}
                       </Link>
                       <button
                         onClick={handleSignOut}
@@ -338,9 +334,9 @@ export default function Navbar() {
                       <p className="text-xs text-neutral-500">{session.user.email}</p>
                     </div>
                   </div>
-                  <Link href={session.user.role === "seller" ? "/admin" : "/profile"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
+                  <Link href={(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "/admin" : "/profile"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
                     <LayoutDashboard size={16} />
-                    {session.user.role === "seller" ? "Dashboard" : "Profile"}
+                    {(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "Dashboard" : "Profile"}
                   </Link>
                   <button onClick={handleSignOut} className="btn-outline w-full justify-center gap-2 !text-red-600 !border-red-200 hover:!bg-red-50 dark:!border-red-900/30 dark:hover:!bg-red-900/20">
                     <LogOut size={16} />

@@ -32,12 +32,12 @@ const footerLinks = [
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  
+
   return (
     <footer className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black pt-16 pb-8">
       <div className="section-container !py-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
-          
+
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-4">
               <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">

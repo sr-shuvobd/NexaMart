@@ -1,8 +1,12 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/(public)/page": "app/(public)/page.js",
-  "/(public)/register/page": "app/(public)/register/page.js",
+  "/api/auth/[...all]/route": "app/api/auth/[...all]/route.js",
   "/(public)/login/page": "app/(public)/login/page.js",
-  "/(protected)/profile/page": "app/(protected)/profile/page.js",
   "/(public)/explore/page": "app/(public)/explore/page.js",
+  "/(public)/about/page": "app/(public)/about/page.js",
+  "/(public)/contact/page": "app/(public)/contact/page.js",
+  "/admin/products/page": "app/admin/products/page.js",
+  "/admin/orders/page": "app/admin/orders/page.js",
   "/admin/page": "app/admin/page.js"
 }

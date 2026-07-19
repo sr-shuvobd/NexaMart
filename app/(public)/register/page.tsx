@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, User, Store, ArrowRight, Github, Phone } from "lucide-react";
 import { toast } from "react-toastify";
+import { useSession } from "@/lib/auth-client";
 
 export default function RegisterPage() {
   const [isSeller, setIsSeller] = useState(false);
@@ -16,6 +17,14 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [storeName, setStoreName] = useState("");
   const [phone, setPhone] = useState("");
+  const { data: session } = useSession();
+
+  // Redirect if already logged in
+  if (session?.user) {
+    const userRole = (session.user as any)?.role;
+    window.location.href = (userRole === "admin" || userRole === "seller") ? "/admin" : "/";
+    return null;
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
