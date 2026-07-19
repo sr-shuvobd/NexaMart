@@ -270,8 +270,8 @@ export default function Navbar() {
               </nav>
             </div>
             <div className="p-6 border-t border-neutral-100 dark:border-neutral-900 flex flex-col gap-3">
-              <Link href="/login" className="btn-outline w-full justify-center">Log in</Link>
-              <Link href="/register" className="btn-primary w-full justify-center">Sign up</Link>
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center">Log in</Link>
+              <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary w-full justify-center">Sign up</Link>
             </div>
           </div>
         </div>
