@@ -1,7 +1,49 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Mail, Lock, ArrowRight, Github } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/sign-in/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Login failed. Please try again.");
+      } else {
+        toast.success("Welcome back! Redirecting...");
+        
+        // Redirect based on role
+        if (data.user?.role === "seller") {
+          setTimeout(() => router.push("/admin"), 1000);
+        } else {
+          setTimeout(() => router.push("/profile"), 1000);
+        }
+      }
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-20 px-6">
       <div className="w-full max-w-[400px] animate-slide-up">
@@ -11,10 +53,9 @@ export default function LoginPage() {
         </div>
 
         <div className="card-base p-6 md:p-8 relative overflow-hidden bg-white/70 dark:bg-[#0a0a0a]/70 backdrop-blur-xl">
-          {/* Subtle decorative glow */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-[40px] pointer-events-none" />
-          
-          <form className="relative z-10 space-y-4">
+
+          <form onSubmit={handleLogin} className="relative z-10 space-y-4">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Email address</label>
               <div className="relative">
@@ -22,6 +63,8 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="input-base !pl-10"
                 />
@@ -40,6 +83,8 @@ export default function LoginPage() {
                 <input
                   type="password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="input-base !pl-10"
                 />
@@ -47,12 +92,22 @@ export default function LoginPage() {
             </div>
 
             <button
-              type="button"
-              className="btn-primary w-full mt-2 group relative overflow-hidden"
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full mt-2 group relative overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                Sign in
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                {loading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign in
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
               </span>
             </button>
           </form>
