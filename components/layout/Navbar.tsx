@@ -4,309 +4,278 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ShoppingCart,
-  Heart,
-  User,
-  Menu,
-  X,
-  Search,
-  Sparkles,
-  ChevronDown,
-  Laptop,
-  Shirt,
-  Home,
-  BookOpen,
-  Dumbbell,
-  Baby,
-  Tag,
-  LayoutGrid,
+  ShoppingCart, Heart, Menu, X, Search,
+  ChevronDown, Sun, Moon, Monitor,
+  Laptop, Shirt, Home, BookOpen, Dumbbell, Baby, Tag, LayoutGrid,
 } from "lucide-react";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const categories = [
-  { name: "Electronics", icon: Laptop, href: "/explore?cat=electronics" },
-  { name: "Fashion", icon: Shirt, href: "/explore?cat=fashion" },
-  { name: "Home & Living", icon: Home, href: "/explore?cat=home" },
-  { name: "Books", icon: BookOpen, href: "/explore?cat=books" },
-  { name: "Sports", icon: Dumbbell, href: "/explore?cat=sports" },
-  { name: "Baby & Kids", icon: Baby, href: "/explore?cat=kids" },
-  { name: "Deals", icon: Tag, href: "/explore?cat=deals" },
-  { name: "All Categories", icon: LayoutGrid, href: "/explore" },
+  { id: "electronics", name: "Electronics",   icon: Laptop,    href: "/explore?cat=electronics" },
+  { id: "fashion",     name: "Fashion",        icon: Shirt,     href: "/explore?cat=fashion" },
+  { id: "home",        name: "Home & Living",  icon: Home,      href: "/explore?cat=home" },
+  { id: "books",       name: "Books",          icon: BookOpen,  href: "/explore?cat=books" },
+  { id: "sports",      name: "Sports",         icon: Dumbbell,  href: "/explore?cat=sports" },
+  { id: "kids",        name: "Baby & Kids",    icon: Baby,      href: "/explore?cat=kids" },
+  { id: "deals",       name: "Deals",          icon: Tag,       href: "/explore?cat=deals" },
+  { id: "all",         name: "All Categories", icon: LayoutGrid,href: "/explore" },
 ];
 
 const navLinks = [
-  { name: "Home", href: "/" },
   { name: "Explore", href: "/explore" },
-  { name: "About", href: "/about" },
+  { name: "About",   href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
 
-export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [catOpen, setCatOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const pathname = usePathname();
-  const catRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-    setCatOpen(false);
-    setSearchOpen(false);
-  }, [pathname]);
-
-  // Close category dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (catRef.current && !catRef.current.contains(e.target as Node)) {
-        setCatOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Focus search input when opened
+  const options = [
+    { value: "light",  label: "Light",  Icon: Sun },
+    { value: "dark",   label: "Dark",   Icon: Moon },
+    { value: "system", label: "System", Icon: Monitor },
+  ];
+
+  const CurrentIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
+
+  return (
+    <div ref={ref} className="relative hidden md:block">
+      <button
+        onClick={() => setOpen(!open)}
+        aria-label="Toggle theme"
+        className="p-2 rounded-lg text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white transition-all"
+      >
+        <CurrentIcon size={16} />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-[#0a0a0a] rounded-lg shadow-card border border-neutral-200 dark:border-neutral-800 py-1 z-50 animate-slide-down">
+          {options.map(({ value, label, Icon }) => (
+            <button
+              key={value}
+              onClick={() => { setTheme(value as "light" | "dark" | "system"); setOpen(false); }}
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 text-sm transition-colors ${
+                theme === value
+                  ? "text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 font-medium"
+                  : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              }`}
+            >
+              <Icon size={14} />
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Navbar() {
+  const [isScrolled, setIsScrolled]     = useState(false);
+  const [mobileOpen, setMobileOpen]     = useState(false);
+  const [catOpen, setCatOpen]           = useState(false);
+  const [searchQuery, setSearchQuery]   = useState("");
+  const pathname  = usePathname();
+  const catRef    = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (searchOpen && searchRef.current) {
-      searchRef.current.focus();
-    }
-  }, [searchOpen]);
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => { setMobileOpen(false); setCatOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (catRef.current && !catRef.current.contains(e.target as Node)) setCatOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? "bg-white/95 dark:bg-gray-950/95 backdrop-blur-md shadow-md py-3 border-b border-gray-100 dark:border-gray-800"
-            : "bg-white dark:bg-gray-950 py-4 border-b border-gray-100 dark:border-gray-900"
+            ? "bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-subtle border-b border-neutral-200/50 dark:border-neutral-800/50 py-3"
+            : "bg-white dark:bg-black border-b border-transparent py-4"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-center gap-6">
-
-            {/* ── Logo ─────────────────── */}
-            <Link href="/" className="flex items-center gap-2 shrink-0 group">
-              <div className="bg-gradient-to-br from-primary-500 to-primary-600 text-white p-1.5 rounded-xl shadow-md group-hover:shadow-primary-500/40 transition-all">
-                <Sparkles size={18} />
-              </div>
-              <span className="text-[1.35rem] font-extrabold tracking-tight text-gray-900 dark:text-white">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-8 flex items-center justify-between">
+          
+          <div className="flex items-center gap-8">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-1.5 shrink-0">
+              <span className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
                 Nexa<span className="text-primary-500">Mart</span>
               </span>
             </Link>
 
-            {/* ── Categories Dropdown ───── */}
-            <div ref={catRef} className="hidden md:block relative">
-              <button
-                onClick={() => setCatOpen(!catOpen)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all border ${
-                  catOpen
-                    ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-primary-200 dark:border-primary-800"
-                    : "text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:border-primary-300 hover:text-primary-600 dark:hover:border-primary-700 dark:hover:text-primary-400"
-                }`}
-              >
-                <LayoutGrid size={16} />
-                Categories
-                <ChevronDown
-                  size={14}
-                  className={`transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {/* Dropdown Panel */}
-              {catOpen && (
-                <div className="absolute top-full left-0 mt-2 w-60 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  {categories.map(({ name, icon: Icon, href }) => (
-                    <Link
-                      key={name}
-                      href={href}
-                      onClick={() => setCatOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-primary-100 dark:group-hover:bg-primary-900/50 transition-colors">
-                        <Icon size={16} />
-                      </div>
-                      {name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ── Search Bar (Desktop) ──── */}
-            <div className="hidden md:flex flex-1 max-w-md items-center bg-gray-100 dark:bg-gray-800 rounded-full border border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 dark:focus-within:ring-primary-900/30 transition-all px-4 py-2 gap-2">
-              <Search size={17} className="text-gray-400 shrink-0" />
-              <input
-                type="text"
-                placeholder="Search products, brands..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none min-w-0"
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery("")} className="text-gray-400 hover:text-gray-600">
-                  <X size={14} />
+            {/* Nav links */}
+            <nav className="hidden lg:flex items-center gap-6" role="navigation">
+              <div ref={catRef} className="relative">
+                <button
+                  onClick={() => setCatOpen(!catOpen)}
+                  aria-haspopup="true"
+                  aria-expanded={catOpen}
+                  className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                    catOpen ? "text-neutral-900 dark:text-white" : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
+                  }`}
+                >
+                  Categories
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`} />
                 </button>
-              )}
-            </div>
 
-            {/* ── Nav Links ─────────────── */}
-            <nav className="hidden lg:flex items-center gap-1">
+                {catOpen && (
+                  <div className="absolute top-full left-0 mt-4 w-64 bg-white dark:bg-[#0a0a0a] rounded-xl shadow-card dark:shadow-dark-card border border-neutral-200 dark:border-neutral-800 p-2 z-50 animate-slide-down">
+                    <div className="grid grid-cols-1 gap-1">
+                      {categories.map(({ name, icon: Icon, href }) => (
+                        <Link
+                          key={name}
+                          href={href}
+                          onClick={() => setCatOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white rounded-lg transition-colors group"
+                        >
+                          <Icon size={16} className="text-neutral-400 group-hover:text-primary-500 transition-colors" />
+                          {name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`text-sm font-medium transition-colors ${
                     pathname === link.href
-                      ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                      ? "text-neutral-900 dark:text-white"
+                      : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   {link.name}
                 </Link>
               ))}
             </nav>
-
-            {/* ── Right Actions ─────────── */}
-            <div className="flex items-center gap-1 ml-auto">
-              {/* Mobile search toggle */}
-              <button
-                className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={() => setSearchOpen(!searchOpen)}
-              >
-                <Search size={20} />
-              </button>
-
-              {/* Wishlist */}
-              <Link
-                href="/wishlist"
-                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-500 transition-all relative"
-              >
-                <Heart size={20} />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-pink-500 rounded-full" />
-              </Link>
-
-              {/* Cart */}
-              <Link
-                href="/cart"
-                className="relative p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-500 transition-all"
-              >
-                <ShoppingCart size={20} />
-                <span className="absolute -top-0.5 -right-0.5 bg-primary-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center shadow">
-                  2
-                </span>
-              </Link>
-
-              {/* Login / Signup Buttons */}
-              <div className="hidden md:flex items-center gap-2 ml-2">
-                <Link
-                  href="/login"
-                  className="text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-primary-500 dark:hover:text-primary-400 transition-colors px-3 py-2"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="flex items-center gap-1.5 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-bold rounded-full shadow-md hover:shadow-primary-500/30 hover:shadow-lg transition-all"
-                >
-                  <User size={15} />
-                  Sign Up
-                </Link>
-              </div>
-
-              {/* Mobile hamburger */}
-              <button
-                className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={() => setMobileOpen(!mobileOpen)}
-              >
-                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-              </button>
-            </div>
           </div>
 
-          {/* ── Mobile Search Bar ─────── */}
-          <div
-            className={`md:hidden overflow-hidden transition-all duration-300 ${
-              searchOpen ? "max-h-20 mt-3" : "max-h-0"
-            }`}
-          >
-            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2.5 gap-2 border border-gray-200 dark:border-gray-700">
-              <Search size={17} className="text-gray-400 shrink-0" />
+          <div className="flex items-center gap-2 lg:gap-4">
+            {/* Search */}
+            <div className="hidden md:flex items-center bg-neutral-100 dark:bg-neutral-900 rounded-md border border-transparent hover:border-neutral-200 dark:hover:border-neutral-800 focus-within:border-neutral-300 dark:focus-within:border-neutral-700 transition-all px-3 py-1.5 w-64">
+              <Search size={14} className="text-neutral-400" />
               <input
-                ref={searchRef}
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 outline-none"
+                className="flex-1 bg-transparent text-sm text-neutral-900 dark:text-white placeholder-neutral-500 outline-none ml-2"
               />
             </div>
-          </div>
-        </div>
 
-        {/* ── Mobile Menu ──────────────── */}
-        <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 border-t border-gray-100 dark:border-gray-800 ${
-            mobileOpen ? "max-h-[500px]" : "max-h-0"
-          }`}
-        >
-          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  pathname === link.href
-                    ? "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                }`}
-              >
-                {link.name}
+            <ThemeToggle />
+
+            {/* Icons */}
+            <Link
+              href="/wishlist"
+              className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            >
+              <Heart size={18} />
+            </Link>
+
+            <Link
+              href="/cart"
+              className="relative p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            >
+              <ShoppingCart size={18} />
+              <span className="absolute top-1 right-0 bg-primary-500 text-white text-[10px] font-medium h-4 w-4 rounded-full flex items-center justify-center">
+                2
+              </span>
+            </Link>
+
+            {/* Auth */}
+            <div className="hidden lg:flex items-center gap-3 ml-2 pl-4 border-l border-neutral-200 dark:border-neutral-800">
+              <Link href="/login" className="text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
+                Log in
               </Link>
-            ))}
-
-            <hr className="border-gray-100 dark:border-gray-800 my-1" />
-
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 pt-1">Categories</p>
-            <div className="grid grid-cols-2 gap-2">
-              {categories.slice(0, 6).map(({ name, icon: Icon, href }) => (
-                <Link
-                  key={name}
-                  href={href}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <Icon size={15} className="text-primary-500" />
-                  {name}
-                </Link>
-              ))}
-            </div>
-
-            <hr className="border-gray-100 dark:border-gray-800 my-1" />
-
-            <div className="flex gap-3 pt-1">
-              <Link
-                href="/login"
-                className="flex-1 text-center py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:border-primary-400 hover:text-primary-600 transition-colors"
-              >
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="flex-1 text-center py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-bold transition-colors shadow-md"
-              >
-                Sign Up Free
+              <Link href="/register" className="btn-primary py-1.5 px-4 text-xs">
+                Sign up
               </Link>
             </div>
+
+            {/* Mobile menu toggle */}
+            <button
+              className="lg:hidden p-2 text-neutral-600 dark:text-neutral-300"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu size={20} />
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setMobileOpen(false)} />
+          <div className="relative ml-auto w-full max-w-sm bg-white dark:bg-[#0a0a0a] shadow-2xl flex flex-col animate-slide-up h-full">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-100 dark:border-neutral-900">
+              <span className="text-lg font-bold">Menu</span>
+              <button onClick={() => setMobileOpen(false)} className="p-2 text-neutral-500 hover:text-neutral-900 dark:hover:text-white rounded-lg">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex items-center bg-neutral-100 dark:bg-neutral-900 rounded-md px-3 py-2 w-full">
+                <Search size={16} className="text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 bg-transparent text-sm text-neutral-900 dark:text-white placeholder-neutral-500 outline-none ml-2"
+                />
+              </div>
+              <nav className="flex flex-col gap-4">
+                {navLinks.map(l => (
+                  <Link key={l.name} href={l.href} onClick={() => setMobileOpen(false)} className="text-base font-medium text-neutral-900 dark:text-white">
+                    {l.name}
+                  </Link>
+                ))}
+                <div className="h-px bg-neutral-100 dark:bg-neutral-900 my-2" />
+                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Categories</p>
+                <div className="grid grid-cols-1 gap-3 mt-2">
+                  {categories.map(c => (
+                    <Link key={c.name} href={c.href} onClick={() => setMobileOpen(false)} className="text-sm text-neutral-600 dark:text-neutral-300">
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+            </div>
+            <div className="p-6 border-t border-neutral-100 dark:border-neutral-900 flex flex-col gap-3">
+              <Link href="/login" className="btn-outline w-full justify-center">Log in</Link>
+              <Link href="/register" className="btn-primary w-full justify-center">Sign up</Link>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
