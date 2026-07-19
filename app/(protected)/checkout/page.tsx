@@ -44,6 +44,32 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetch(`http://localhost:5000/api/users/${session.user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.user.addresses && data.user.addresses.length > 0) {
+            const defAddr = data.user.addresses.find((a: any) => a.isDefault) || data.user.addresses[0];
+            const nameParts = session.user.name.split(" ");
+            setShipping({
+              firstName: nameParts[0] || "",
+              lastName: nameParts.slice(1).join(" ") || "",
+              address: defAddr.street,
+              city: defAddr.city,
+              zipCode: defAddr.zipCode
+            });
+          } else {
+            toast.error("Please add a delivery address in your profile before checkout.");
+            router.push("/profile");
+          }
+        })
+        .catch(() => {
+          // Ignore error
+        });
+    }
+  }, [session?.user?.id, router]);
+
   const handlePayment = async () => {
     if (!session?.user?.id) {
       toast.error("Please log in to complete your order.");
@@ -83,7 +109,11 @@ export default function CheckoutPage() {
       
       if (res.data.success) {
         setOrderNumber(res.data.order.orderNumber);
-        localStorage.removeItem("nexamart_cart"); // clear cart
+        
+        // Use CartWishlistProvider to clear cart so navbar updates
+        // Since we are not using useStore here directly, we dispatch a custom event
+        window.dispatchEvent(new Event("nexamart_cart_cleared"));
+        
         setStep(3); // success
       }
     } catch (error) {

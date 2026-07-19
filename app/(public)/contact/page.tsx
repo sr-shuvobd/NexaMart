@@ -1,6 +1,7 @@
 "use client";
-
 import { useState } from "react";
+import api from "@/lib/axios";
+import { toast } from "react-toastify";
 import { Mail, Phone, MapPin, Send, CheckCircle, Plus, Minus } from "lucide-react";
 
 const contactInfo = [
@@ -25,9 +26,17 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setSubmitted(true);
+    try {
+      const res = await api.post("/api/messages", form);
+      if (res.data.success) {
+        setSubmitted(true);
+        toast.success("Message sent successfully!");
+      }
+    } catch (error) {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

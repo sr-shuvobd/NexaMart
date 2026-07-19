@@ -2,6 +2,7 @@
 
 import { useSession } from "@/lib/auth-client";
 import { User } from "lucide-react";
+import AddressManager from "@/components/profile/AddressManager";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -45,6 +46,8 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          <AddressManager />
         </div>
       </div>
     </div>

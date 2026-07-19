@@ -8,63 +8,39 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useStore } from "@/providers/CartWishlistProvider";
 
 const categories = [
   { id: "all", name: "All Products", icon: Sparkles },
-  { id: "electronics", name: "Electronics", icon: Laptop },
-  { id: "fashion", name: "Fashion", icon: Shirt },
-  { id: "home", name: "Home", icon: Home },
-  { id: "books", name: "Books", icon: BookOpen },
-  { id: "sports", name: "Sports", icon: Dumbbell },
-  { id: "kids", name: "Kids", icon: Baby },
-  { id: "deals", name: "Deals", icon: Tag },
+  { id: "Smartphones", name: "Smartphones", icon: Laptop },
+  { id: "Laptops", name: "Laptops", icon: Laptop },
+  { id: "Electronics", name: "Electronics", icon: Laptop },
+  { id: "Gaming", name: "Gaming", icon: Sparkles },
+  { id: "Audio", name: "Audio", icon: Sparkles },
+  { id: "Cameras", name: "Cameras", icon: Sparkles },
+  { id: "Wearables", name: "Wearables", icon: Sparkles },
+  { id: "Accessories", name: "Accessories", icon: Sparkles },
+  { id: "Fashion", name: "Fashion", icon: Shirt },
+  { id: "Fitness", name: "Fitness", icon: Dumbbell },
+  { id: "Home Appliances", name: "Appliances", icon: Home },
+  { id: "Furniture", name: "Furniture", icon: Home },
+  { id: "Groceries", name: "Groceries", icon: Tag },
 ];
 
 export default function ExploreClient({ initialProducts }: { initialProducts: any[] }) {
   const [products] = useState<any[]>(initialProducts);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [priceRange, setPriceRange] = useState([0, 5000]);
   const [sortBy, setSortBy] = useState("popular");
   const [gridView, setGridView] = useState(true);
-  const [wishlist, setWishlist] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleWishlist = (id: string, name: string) => {
-    setWishlist(p => {
-      const exists = p.includes(id);
-      if (exists) {
-        toast.info(`Removed ${name} from Wishlist`);
-        return p.filter(i => i !== id);
-      } else {
-        toast.success(`Added ${name} to Wishlist!`);
-        return [...p, id];
-      }
-    });
-  };
-
-  const handleAddToCart = (product: any) => {
-    try {
-      const existingCart = localStorage.getItem("nexamart_cart");
-      let cart = existingCart ? JSON.parse(existingCart) : [];
-      
-      const existingItemIndex = cart.findIndex((item: any) => item._id === product._id);
-      if (existingItemIndex > -1) {
-        cart[existingItemIndex].quantity += 1;
-      } else {
-        cart.push({ ...product, quantity: 1, id: product._id });
-      }
-      
-      localStorage.setItem("nexamart_cart", JSON.stringify(cart));
-      toast.success(`Added ${product.name} to Cart!`);
-    } catch (error) {
-      toast.error("Failed to add to cart");
-    }
-  };
+  
+  const { addToCart, toggleWishlist, isInWishlist } = useStore();
 
   const filtered = useMemo(() => {
     let items = products.filter((p) => {
-      if (activeCategory !== "all" && p.category !== activeCategory) return false;
+      if (activeCategory !== "all" && p.category?.toLowerCase() !== activeCategory.toLowerCase()) return false;
       if (p.price > priceRange[1]) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
@@ -146,7 +122,7 @@ export default function ExploreClient({ initialProducts }: { initialProducts: an
                 <span>${priceRange[1]}</span>
               </div>
               <input
-                type="range" min={0} max={500} step={10}
+                type="range" min={0} max={5000} step={50}
                 value={priceRange[1]}
                 onChange={(e) => setPriceRange([0, +e.target.value])}
                 className="w-full accent-neutral-900 dark:accent-white"
@@ -222,10 +198,10 @@ export default function ExploreClient({ initialProducts }: { initialProducts: an
                       )}
                     </Link>
                     <button
-                      onClick={(e) => { e.preventDefault(); toggleWishlist(product._id, product.name); }}
-                      className={`absolute top-3 right-3 p-1.5 rounded-full bg-white dark:bg-black border transition-colors shadow-sm z-10 ${wishlist.includes(product._id) ? "border-red-200 text-red-500" : "border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
+                      onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+                      className={`absolute top-3 right-3 p-1.5 rounded-full bg-white dark:bg-black border transition-colors shadow-sm z-10 ${isInWishlist(product._id) ? "border-red-200 text-red-500" : "border-neutral-200 dark:border-neutral-800 text-neutral-400 hover:text-neutral-900 dark:hover:text-white"}`}
                     >
-                      <Heart size={14} className={wishlist.includes(product._id) ? "fill-current" : ""} />
+                      <Heart size={14} className={isInWishlist(product._id) ? "fill-current" : ""} />
                     </button>
                     <div className="p-4 flex flex-col flex-1">
                       <Link href={`/products/${product._id}`} className="text-sm font-medium text-neutral-900 dark:text-white mb-1 line-clamp-1 hover:text-primary-500">
@@ -239,7 +215,7 @@ export default function ExploreClient({ initialProducts }: { initialProducts: an
                       <div className="mt-auto flex items-center justify-between pt-2">
                         <span className="text-sm font-semibold text-neutral-900 dark:text-white">${product.price}</span>
                         <button 
-                          onClick={(e) => { e.preventDefault(); handleAddToCart(product); }}
+                          onClick={(e) => { e.preventDefault(); addToCart(product); }}
                           className="text-xs font-medium bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white px-3 py-1.5 rounded-md transition-colors"
                         >
                           Add
@@ -264,13 +240,13 @@ export default function ExploreClient({ initialProducts }: { initialProducts: an
                     </div>
                     <div className="flex flex-col justify-between items-end">
                       <button
-                        onClick={(e) => { e.preventDefault(); toggleWishlist(product._id, product.name); }}
-                        className={`p-1.5 rounded-full border transition-colors z-10 ${wishlist.includes(product._id) ? "border-red-200 text-red-500 bg-red-50 dark:bg-red-900/10" : "border-transparent text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"}`}
+                        onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+                        className={`p-1.5 rounded-full border transition-colors z-10 ${isInWishlist(product._id) ? "border-red-200 text-red-500 bg-red-50 dark:bg-red-900/10" : "border-transparent text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900"}`}
                       >
-                        <Heart size={16} className={wishlist.includes(product._id) ? "fill-current" : ""} />
+                        <Heart size={16} className={isInWishlist(product._id) ? "fill-current" : ""} />
                       </button>
                       <button 
-                        onClick={(e) => { e.preventDefault(); handleAddToCart(product); }}
+                        onClick={(e) => { e.preventDefault(); addToCart(product); }}
                         className="text-xs font-medium bg-neutral-900 dark:bg-white text-white dark:text-black px-4 py-2 rounded-md hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors z-10"
                       >
                         Add to Cart

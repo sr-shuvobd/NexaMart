@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield, Search, TrendingUp, Users, ShoppingBag, Star, Package, Smile } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +30,7 @@ async function getFeaturedProduct() {
 export default async function HomePage() {
   const stats = await getAdminStats();
   const featuredProduct = await getFeaturedProduct();
+  const session = await auth.api.getSession({ headers: headers() });
 
   return (
     <div className="flex flex-col overflow-hidden">
@@ -227,29 +230,31 @@ export default async function HomePage() {
       </section>
 
       {/* ── CTA FULL WIDTH ── */}
-      <section className="relative py-32 overflow-hidden bg-neutral-900 dark:bg-neutral-900">
-        <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2000&auto=format&fit=crop" alt="Background" className="w-full h-full object-cover opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/80 to-transparent" />
-        </div>
-        
-        <div className="relative z-10 section-container !py-0 text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-6 max-w-3xl mx-auto">
-            Ready to upgrade your shopping experience?
-          </h2>
-          <p className="text-xl text-neutral-300 mb-10 max-w-2xl mx-auto">
-            Join the platform that combines luxury design with artificial intelligence. Create your free account today.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/register" className="btn-primary-green px-10 py-4 text-lg rounded-full shadow-[0_0_40px_rgba(34,197,94,0.3)] hover:shadow-[0_0_60px_rgba(34,197,94,0.5)]">
-              Create Free Account
-            </Link>
-            <Link href="/explore" className="btn-outline border-white/20 text-white hover:bg-white/10 px-10 py-4 text-lg rounded-full">
-              Explore Catalog
-            </Link>
+      {!session?.user && (
+        <section className="relative py-32 overflow-hidden bg-neutral-900 dark:bg-neutral-900">
+          <div className="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2000&auto=format&fit=crop" alt="Background" className="w-full h-full object-cover opacity-20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/80 to-transparent" />
           </div>
-        </div>
-      </section>
+          
+          <div className="relative z-10 section-container !py-0 text-center">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-6 max-w-3xl mx-auto">
+              Ready to upgrade your shopping experience?
+            </h2>
+            <p className="text-xl text-neutral-300 mb-10 max-w-2xl mx-auto">
+              Join the platform that combines luxury design with artificial intelligence. Create your free account today.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link href="/register" className="btn-primary-green px-10 py-4 text-lg rounded-full shadow-[0_0_40px_rgba(34,197,94,0.3)] hover:shadow-[0_0_60px_rgba(34,197,94,0.5)]">
+                Create Free Account
+              </Link>
+              <Link href="/explore" className="btn-outline border-white/20 text-white hover:bg-white/10 px-10 py-4 text-lg rounded-full">
+                Explore Catalog
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

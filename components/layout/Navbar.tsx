@@ -7,10 +7,14 @@ import {
   ShoppingCart, Heart, Menu, X, Search,
   ChevronDown, Sun, Moon, Monitor,
   Laptop, Shirt, Home, BookOpen, Dumbbell, Baby, Tag, LayoutGrid,
-  User, LogOut, LayoutDashboard
+  User,
+  LayoutDashboard,
+  LogOut,
+  Package,
 } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useSession, signOut } from "@/lib/auth-client";
+import { useStore } from "@/providers/CartWishlistProvider";
 
 const categories = [
   { id: "electronics", name: "Electronics", icon: Laptop, href: "/explore?cat=electronics" },
@@ -89,6 +93,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const catRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const { cart, wishlist } = useStore();
 
   const { data: session, isPending } = useSession();
 
@@ -207,9 +212,14 @@ export default function Navbar() {
             {/* Icons */}
             <Link
               href="/wishlist"
-              className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+              className="relative p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
             >
               <Heart size={18} />
+              {wishlist.length > 0 && (
+                <span className="absolute top-1 right-0 bg-red-500 text-white text-[10px] font-medium h-4 w-4 rounded-full flex items-center justify-center">
+                  {wishlist.length}
+                </span>
+              )}
             </Link>
 
             <Link
@@ -217,9 +227,11 @@ export default function Navbar() {
               className="relative p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
             >
               <ShoppingCart size={18} />
-              <span className="absolute top-1 right-0 bg-primary-500 text-white text-[10px] font-medium h-4 w-4 rounded-full flex items-center justify-center">
-                2
-              </span>
+              {cart.reduce((total, item) => total + item.quantity, 0) > 0 && (
+                <span className="absolute top-1 right-0 bg-primary-500 text-white text-[10px] font-medium h-4 w-4 rounded-full flex items-center justify-center">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              )}
             </Link>
 
             {/* Auth */}
@@ -232,8 +244,12 @@ export default function Navbar() {
                     onClick={() => setProfileOpen(!profileOpen)}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
-                      {session.user.name.charAt(0).toUpperCase()}
+                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 overflow-hidden flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm border border-neutral-200 dark:border-neutral-800">
+                      {session.user.image ? (
+                        <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        session.user.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                   </button>
                   {profileOpen && (
@@ -243,12 +259,46 @@ export default function Navbar() {
                         <p className="text-xs text-neutral-500 truncate">{session.user.email}</p>
                       </div>
                       <Link
-                        href={(session.user as any).role === "admin" ? "/admin" : (session.user as any).role === "seller" ? "/seller" : "/profile"}
+                        href="/profile"
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
                       >
-                        <LayoutDashboard size={14} />
-                        {(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "Dashboard" : "Profile"}
+                        <User size={14} />
+                        My Profile
+                      </Link>
+                      {((session.user as any).role === "admin" || (session.user as any).role === "seller") && (
+                        <Link
+                          href={(session.user as any).role === "admin" ? "/admin" : "/seller"}
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                        >
+                          <LayoutDashboard size={14} />
+                          Dashboard
+                        </Link>
+                      )}
+                      <Link
+                        href="/orders"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                      >
+                        <Package size={14} />
+                        Orders
+                      </Link>
+                      <Link
+                        href="/wishlist"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                      >
+                        <Heart size={14} />
+                        Wishlist
+                      </Link>
+                      <Link
+                        href="/cart"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                      >
+                        <ShoppingCart size={14} />
+                        Cart
                       </Link>
                       <button
                         onClick={handleSignOut}
@@ -326,17 +376,28 @@ export default function Navbar() {
               {session?.user ? (
                 <>
                   <div className="flex items-center gap-3 mb-2 px-2">
-                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-lg">
-                      {session.user.name.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 overflow-hidden flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-lg border border-neutral-200 dark:border-neutral-800">
+                      {session.user.image ? (
+                        <img src={session.user.image} alt={session.user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        session.user.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div>
                       <p className="text-sm font-bold text-neutral-900 dark:text-white">{session.user.name}</p>
                       <p className="text-xs text-neutral-500">{session.user.email}</p>
                     </div>
                   </div>
-                  <Link href={(session.user as any).role === "admin" ? "/admin" : (session.user as any).role === "seller" ? "/seller" : "/profile"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
-                    <LayoutDashboard size={16} />
-                    {(session.user as any).role === "seller" || (session.user as any).role === "admin" ? "Dashboard" : "Profile"}
+                  <Link href="/profile" onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
+                    <User size={16} /> My Profile
+                  </Link>
+                  {((session.user as any).role === "admin" || (session.user as any).role === "seller") && (
+                    <Link href={(session.user as any).role === "admin" ? "/admin" : "/seller"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
+                      <LayoutDashboard size={16} /> Dashboard
+                    </Link>
+                  )}
+                  <Link href="/orders" onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
+                    <Package size={16} /> Orders
                   </Link>
                   <button onClick={handleSignOut} className="btn-outline w-full justify-center gap-2 !text-red-600 !border-red-200 hover:!bg-red-50 dark:!border-red-900/30 dark:hover:!bg-red-900/20">
                     <LogOut size={16} />

@@ -36,8 +36,12 @@ export default function SellerNavigation() {
     <>
       {/* Profile Section in Sidebar */}
       <div className="flex flex-col items-center p-6 border-b border-neutral-200 dark:border-neutral-800/50">
-        <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-2xl mb-3 border-2 border-primary-500/20">
-          {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "S"}
+        <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-2xl mb-3 border-2 border-primary-500/20 overflow-hidden">
+          {session?.user?.image ? (
+            <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "S"
+          )}
         </div>
         <h3 className="font-bold text-neutral-900 dark:text-white mb-0.5">
           {(session?.user as any)?.storeName || session?.user?.name || "Seller"}
@@ -112,8 +116,12 @@ export default function SellerNavigation() {
           </button>
           
           <div className="hidden sm:flex items-center gap-2 ml-2 pl-4 border-l border-neutral-200 dark:border-neutral-800">
-            <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
-              {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "S"}
+            <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm overflow-hidden">
+              {session?.user?.image ? (
+                <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "S"
+              )}
             </div>
             <span className="text-sm font-medium text-neutral-900 dark:text-white mx-2">{session?.user?.name || "Seller"}</span>
             <button onClick={handleSignOut} className="flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-600 transition-colors ml-2">

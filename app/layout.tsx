@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import RootLayoutClient from "@/components/layout/RootLayoutClient";
+import { CartWishlistProvider } from "@/providers/CartWishlistProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -42,9 +43,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-white`}>
-        <RootLayoutClient>
-          {children}
-        </RootLayoutClient>
+        <CartWishlistProvider>
+          <RootLayoutClient>
+            {children}
+          </RootLayoutClient>
+        </CartWishlistProvider>
       </body>
     </html>
   );

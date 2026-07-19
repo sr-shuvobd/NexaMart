@@ -1,6 +1,7 @@
-import { Star, Truck, Shield, ShoppingBag, Heart } from "lucide-react";
+import { Star, Truck, Shield } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ProductActions from "@/components/product/ProductActions";
 
 async function getProduct(id: string) {
   try {
@@ -87,15 +88,7 @@ export default async function ProductDetailsPage({ params }: { params: { id: str
               {product.description || "No description provided for this product. It is a highly rated item in our store."}
             </p>
 
-            <div className="flex items-center gap-4 mb-10">
-              <button className="btn-primary flex-1 py-4 text-lg rounded-xl flex items-center justify-center gap-2">
-                <ShoppingBag size={20} />
-                Add to Cart
-              </button>
-              <button className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/30 transition-colors">
-                <Heart size={24} />
-              </button>
-            </div>
+            <ProductActions product={product} />
 
             <div className="grid sm:grid-cols-2 gap-4 pt-8 border-t border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center gap-3 text-sm text-neutral-700 dark:text-neutral-300">

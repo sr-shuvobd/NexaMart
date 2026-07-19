@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Menu, X, Sun, Moon, Monitor } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Menu, X, Sun, Moon, Monitor, MessageSquare } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -28,6 +28,7 @@ export default function AdminNavigation() {
     if (pathname.includes("/products")) return "Manage Products";
     if (pathname.includes("/orders")) return "Manage Orders";
     if (pathname.includes("/users")) return "Manage Users";
+    if (pathname.includes("/messages")) return "Messages";
     if (pathname.includes("/settings")) return "Settings";
     return "Dashboard";
   };
@@ -36,8 +37,12 @@ export default function AdminNavigation() {
     <>
       {/* Profile Section in Sidebar */}
       <div className="flex flex-col items-center p-6 border-b border-neutral-200 dark:border-neutral-800/50">
-        <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-2xl mb-3 border-2 border-primary-500/20">
-          {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+        <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-2xl mb-3 border-2 border-primary-500/20 overflow-hidden">
+          {session?.user?.image ? (
+            <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+          ) : (
+            session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"
+          )}
         </div>
         <h3 className="font-bold text-neutral-900 dark:text-white mb-0.5">{session?.user?.name || "Admin User"}</h3>
         <p className="text-xs text-neutral-500 mb-3">{session?.user?.email}</p>
@@ -62,6 +67,10 @@ export default function AdminNavigation() {
         <Link href="/admin/orders" onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${pathname.includes("/orders") ? "bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400" : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 hover:text-neutral-900 dark:hover:text-white"}`}>
           <ShoppingBag size={18} />
           Manage Orders
+        </Link>
+        <Link href="/admin/messages" onClick={() => setMobileOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors ${pathname.includes("/messages") ? "bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400" : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 hover:text-neutral-900 dark:hover:text-white"}`}>
+          <MessageSquare size={18} />
+          Messages
         </Link>
       </nav>
       <div className="p-4 border-t border-neutral-200 dark:border-neutral-800/50 space-y-1">
@@ -110,8 +119,12 @@ export default function AdminNavigation() {
           </button>
           
           <div className="hidden sm:flex items-center gap-2 ml-2 pl-4 border-l border-neutral-200 dark:border-neutral-800">
-            <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
-              {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"}
+            <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm overflow-hidden">
+              {session?.user?.image ? (
+                <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "A"
+              )}
             </div>
             <span className="text-sm font-medium text-neutral-900 dark:text-white mx-2">{session?.user?.name || "Admin"}</span>
             <button onClick={handleSignOut} className="flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-600 transition-colors ml-2">

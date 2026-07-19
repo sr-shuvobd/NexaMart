@@ -5,6 +5,17 @@ import { useSession } from "@/lib/auth-client";
 import { Package, ShoppingBag, DollarSign, ArrowUpRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+const chartData = [
+  { name: 'Mon', sales: 120 },
+  { name: 'Tue', sales: 200 },
+  { name: 'Wed', sales: 150 },
+  { name: 'Thu', sales: 300 },
+  { name: 'Fri', sales: 400 },
+  { name: 'Sat', sales: 350 },
+  { name: 'Sun', sales: 500 },
+];
 
 export default function SellerDashboardPage() {
   const { data: session } = useSession();
@@ -91,6 +102,30 @@ export default function SellerDashboardPage() {
             <h3 className="font-medium text-neutral-900 dark:text-white group-hover:text-primary-500 transition-colors">View My Products</h3>
             <p className="text-xs text-neutral-500 mt-1">Manage your existing inventory.</p>
           </Link>
+        </div>
+      </div>
+
+      <div className="card-base p-6 flex flex-col">
+        <h2 className="text-base font-semibold text-neutral-900 dark:text-white mb-6">Weekly Sales</h2>
+        <div className="flex-1 w-full h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.2} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} dx={-10} tickFormatter={(value) => `$${value}`} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#171717', border: 'none', borderRadius: '8px', color: '#fff' }}
+                itemStyle={{ color: '#3b82f6' }}
+              />
+              <Area type="monotone" dataKey="sales" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
