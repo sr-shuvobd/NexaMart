@@ -32,9 +32,9 @@ export default function LoginPage() {
         
         // Redirect based on role
         if (data.user?.role === "seller") {
-          setTimeout(() => router.push("/admin"), 1000);
+          setTimeout(() => { window.location.href = "/admin"; }, 1000);
         } else {
-          setTimeout(() => router.push("/profile"), 1000);
+          setTimeout(() => { window.location.href = "/"; }, 1000);
         }
       }
     } catch {

@@ -7,8 +7,10 @@ import {
   ShoppingCart, Heart, Menu, X, Search,
   ChevronDown, Sun, Moon, Monitor,
   Laptop, Shirt, Home, BookOpen, Dumbbell, Baby, Tag, LayoutGrid,
+  User, LogOut, LayoutDashboard
 } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useSession, signOut } from "@/lib/auth-client";
 
 const categories = [
   { id: "electronics", name: "Electronics",   icon: Laptop,    href: "/explore?cat=electronics" },
@@ -84,8 +86,12 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen]     = useState(false);
   const [catOpen, setCatOpen]           = useState(false);
   const [searchQuery, setSearchQuery]   = useState("");
+  const [profileOpen, setProfileOpen]   = useState(false);
   const pathname  = usePathname();
   const catRef    = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const { data: session, isPending } = useSession();
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 10);
@@ -98,10 +104,21 @@ export default function Navbar() {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (catRef.current && !catRef.current.contains(e.target as Node)) setCatOpen(false);
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = "/login";
+        },
+      },
+    });
+  };
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
@@ -211,12 +228,52 @@ export default function Navbar() {
 
             {/* Auth */}
             <div className="hidden lg:flex items-center gap-3 ml-2 pl-4 border-l border-neutral-200 dark:border-neutral-800">
-              <Link href="/login" className="text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
-                Log in
-              </Link>
-              <Link href="/register" className="btn-primary py-1.5 px-4 text-xs">
-                Sign up
-              </Link>
+              {isPending ? (
+                <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+              ) : session?.user ? (
+                <div ref={profileRef} className="relative">
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
+                      {session.user.name.charAt(0).toUpperCase()}
+                    </div>
+                  </button>
+                  {profileOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#0a0a0a] rounded-xl shadow-card border border-neutral-200 dark:border-neutral-800 py-1 z-50 animate-slide-down">
+                      <div className="px-4 py-2 border-b border-neutral-100 dark:border-neutral-800 mb-1">
+                        <p className="text-sm font-medium text-neutral-900 dark:text-white truncate">{session.user.name}</p>
+                        <p className="text-xs text-neutral-500 truncate">{session.user.email}</p>
+                      </div>
+                      <Link
+                        href={session.user.role === "seller" ? "/admin" : "/profile"}
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-white transition-colors"
+                      >
+                        <LayoutDashboard size={14} />
+                        {session.user.role === "seller" ? "Dashboard" : "Profile"}
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      >
+                        <LogOut size={14} />
+                        Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link href="/login" className="text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white transition-colors">
+                    Log in
+                  </Link>
+                  <Link href="/register" className="btn-primary py-1.5 px-4 text-xs">
+                    Sign up
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile menu toggle */}
@@ -270,8 +327,32 @@ export default function Navbar() {
               </nav>
             </div>
             <div className="p-6 border-t border-neutral-100 dark:border-neutral-900 flex flex-col gap-3">
-              <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center">Log in</Link>
-              <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary w-full justify-center">Sign up</Link>
+              {session?.user ? (
+                <>
+                  <div className="flex items-center gap-3 mb-2 px-2">
+                    <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-lg">
+                      {session.user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-neutral-900 dark:text-white">{session.user.name}</p>
+                      <p className="text-xs text-neutral-500">{session.user.email}</p>
+                    </div>
+                  </div>
+                  <Link href={session.user.role === "seller" ? "/admin" : "/profile"} onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center gap-2">
+                    <LayoutDashboard size={16} />
+                    {session.user.role === "seller" ? "Dashboard" : "Profile"}
+                  </Link>
+                  <button onClick={handleSignOut} className="btn-outline w-full justify-center gap-2 !text-red-600 !border-red-200 hover:!bg-red-50 dark:!border-red-900/30 dark:hover:!bg-red-900/20">
+                    <LogOut size={16} />
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setMobileOpen(false)} className="btn-outline w-full justify-center">Log in</Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)} className="btn-primary w-full justify-center">Sign up</Link>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -1,9 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/(public)/page": "app/(public)/page.js",
   "/(public)/register/page": "app/(public)/register/page.js",
   "/(public)/login/page": "app/(public)/login/page.js",
-  "/api/auth/[...all]/route": "app/api/auth/[...all]/route.js",
   "/(protected)/profile/page": "app/(protected)/profile/page.js",
+  "/(public)/explore/page": "app/(public)/explore/page.js",
   "/admin/page": "app/admin/page.js"
 }
