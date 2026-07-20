@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield, Search, TrendingUp, Users, ShoppingBag, Star, Package, Smile } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import AutoRedirect from "./AutoRedirect";
 
 export const dynamic = 'force-dynamic';
 
@@ -31,9 +33,20 @@ export default async function HomePage() {
   const stats = await getAdminStats();
   const featuredProduct = await getFeaturedProduct();
   const session = await auth.api.getSession({ headers: headers() });
+  console.log("SERVER COMPONENT SESSION:", session?.user);
+
+  if (session?.user) {
+    const role = (session.user as any).role;
+    if (role === "admin") {
+      redirect("/admin");
+    } else if (role === "seller") {
+      redirect("/seller");
+    }
+  }
 
   return (
     <div className="flex flex-col overflow-hidden">
+      <AutoRedirect />
       {/* ── STUNNING HERO SECTION ── */}
       <section className="relative min-h-[90vh] pt-32 pb-20 flex items-center justify-center bg-white dark:bg-black overflow-hidden">
         {/* Dynamic Background Effects */}

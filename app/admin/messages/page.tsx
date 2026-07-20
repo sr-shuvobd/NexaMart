@@ -75,7 +75,7 @@ export default function AdminMessagesPage() {
         ) : (
           <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {messages.map((msg) => (
-              <div key={msg._id} className={`p-6 transition-colors ${!msg.read ? 'bg-primary-50/50 dark:bg-primary-900/10' : ''}`}>
+              <div key={msg._id} className={`p-6 transition-colors ${!msg.read ? 'bg-primary-50/50 dark:bg-primary-900/20' : ''}`}>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-3">
                     <h3 className={`text-base ${!msg.read ? 'font-bold text-neutral-900 dark:text-white' : 'font-medium text-neutral-700 dark:text-neutral-300'}`}>
@@ -114,7 +114,7 @@ export default function AdminMessagesPage() {
                 <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-2">
                   Subject: {msg.subject}
                 </h4>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap bg-neutral-50 dark:bg-neutral-900 p-4 rounded-lg border border-neutral-100 dark:border-neutral-800 mt-2">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300 whitespace-pre-wrap bg-neutral-50 dark:bg-[#141414] p-4 rounded-lg border border-neutral-100 dark:border-neutral-800 mt-2">
                   {msg.message}
                 </p>
               </div>
