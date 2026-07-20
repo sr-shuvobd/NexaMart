@@ -42,6 +42,38 @@ export default function AdminDashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleDownloadReport = () => {
+    if (!stats) {
+      toast.error("No data available to download");
+      return;
+    }
+
+    const reportData = `NexaMart Admin Report
+Generated on: ${new Date().toLocaleString()}
+
+--- SUMMARY ---
+Total Revenue: $${stats.totalRevenue?.toFixed(2) || '0.00'}
+Total Orders: ${stats.totalOrders || 0}
+Total Users: ${stats.totalUsers || 0}
+Total Products: ${stats.totalProducts || 0}
+
+--- RECENT ORDERS ---
+${recentOrders.length > 0 ? recentOrders.map(o => `Order ID: ${o._id}, Amount: $${o.totalAmount}, Status: ${o.status}, Date: ${new Date(o.createdAt).toLocaleDateString()}`).join('\n') : 'No recent orders.'}
+`;
+
+    const blob = new Blob([reportData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `NexaMart_Admin_Report_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Report downloaded successfully");
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
       
@@ -64,7 +96,7 @@ export default function AdminDashboardPage() {
             <option value="30d">Last 30 Days</option>
             <option value="1y">Last 1 Year</option>
           </select>
-          <button className="btn-primary-green !py-2">Download Report</button>
+          <button onClick={handleDownloadReport} className="btn-primary-green !py-2">Download Report</button>
         </div>
       </div>
 
