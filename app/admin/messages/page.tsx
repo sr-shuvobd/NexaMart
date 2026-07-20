@@ -75,27 +75,31 @@ export default function AdminMessagesPage() {
         ) : (
           <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {messages.map((msg) => (
-              <div key={msg._id} className={`p-6 transition-colors ${!msg.read ? 'bg-primary-50/50 dark:bg-primary-900/20' : ''}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-3">
-                    <h3 className={`text-base ${!msg.read ? 'font-bold text-neutral-900 dark:text-white' : 'font-medium text-neutral-700 dark:text-neutral-300'}`}>
-                      {msg.name}
-                    </h3>
-                    <span className="text-sm text-neutral-500">({msg.email})</span>
-                    {!msg.read && (
-                      <span className="px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 text-xs font-bold">
-                        NEW
-                      </span>
-                    )}
+              <div key={msg._id} className={`p-6 transition-colors relative border-l-4 ${!msg.read ? 'border-primary-500 bg-primary-50/30 dark:bg-primary-900/10' : 'border-transparent bg-white dark:bg-[#0a0a0a] hover:bg-neutral-50 dark:hover:bg-neutral-900/50'}`}>
+                <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <h3 className={`text-lg ${!msg.read ? 'font-bold text-neutral-900 dark:text-white' : 'font-medium text-neutral-700 dark:text-neutral-300'}`}>
+                        {msg.name}
+                      </h3>
+                      {!msg.read && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 text-[10px] uppercase tracking-wider font-bold">
+                          New
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5">
+                      <Mail size={14} /> {msg.email}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-neutral-400 mr-2">
-                      {new Date(msg.createdAt).toLocaleDateString()}
+                  <div className="flex items-center gap-2 sm:ml-auto">
+                    <span className="text-xs font-medium text-neutral-400 dark:text-neutral-500 mr-2 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1 rounded-md">
+                      {new Date(msg.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                     </span>
                     {!msg.read && (
                       <button 
                         onClick={() => markAsRead(msg._id)}
-                        className="p-1.5 text-neutral-400 hover:text-primary-500 transition-colors tooltip-trigger relative"
+                        className="p-2 text-neutral-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-all tooltip-trigger relative"
                         title="Mark as read"
                       >
                         <CheckCircle size={18} />
@@ -103,7 +107,7 @@ export default function AdminMessagesPage() {
                     )}
                     <button 
                       onClick={() => deleteMessage(msg._id)}
-                      className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors"
+                      className="p-2 text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                       title="Delete"
                     >
                       <Trash2 size={18} />
@@ -111,12 +115,15 @@ export default function AdminMessagesPage() {
                   </div>
                 </div>
                 
-                <h4 className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 mb-2">
-                  Subject: {msg.subject}
-                </h4>
-                <p className="text-sm text-neutral-600 dark:text-neutral-300 whitespace-pre-wrap bg-neutral-50 dark:bg-[#141414] p-4 rounded-lg border border-neutral-100 dark:border-neutral-800 mt-2">
-                  {msg.message}
-                </p>
+                <div className="pl-0 sm:pl-[4.5rem]">
+                  <h4 className="text-sm font-semibold text-neutral-900 dark:text-white mb-2 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
+                    {msg.subject}
+                  </h4>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-300 whitespace-pre-wrap bg-neutral-50/50 dark:bg-[#111111] p-5 rounded-xl border border-neutral-100 dark:border-neutral-800/60 leading-relaxed shadow-sm">
+                    {msg.message}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
