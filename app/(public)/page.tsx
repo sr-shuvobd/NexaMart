@@ -18,6 +18,7 @@ async function getAdminStats() {
   }
 }
 
+
 async function getFeaturedProduct() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products?limit=1`, { cache: "no-store" });
