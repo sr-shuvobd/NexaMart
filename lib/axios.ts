@@ -32,4 +32,31 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("nexamart_jwt");
+        try {
+          const res = await fetch("/api/auth/token");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.token) {
+              localStorage.setItem("nexamart_jwt", data.token);
+              originalRequest.headers.Authorization = `Bearer ${data.token}`;
+              return api(originalRequest);
+            }
+          }
+        } catch (e) {
+          console.error("Token retry failed", e);
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

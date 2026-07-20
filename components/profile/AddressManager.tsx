@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Edit2, Trash2, MapPin, Check, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSession } from "@/lib/auth-client";
+import api from "@/lib/axios";
 
 interface Address {
   id: string;
@@ -30,8 +31,8 @@ export default function AddressManager() {
 
   const fetchAddresses = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${session?.user?.id}`);
-      const data = await res.json();
+      const res = await api.get(`/api/users/${session?.user?.id}`);
+      const data = res.data;
       if (data.success && data.user.addresses) {
         setAddresses(data.user.addresses);
       }
@@ -44,12 +45,10 @@ export default function AddressManager() {
 
   const saveAddresses = async (newAddresses: Address[]) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${session?.user?.id}/addresses`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ addresses: newAddresses })
+      const res = await api.put(`/api/users/${session?.user?.id}/addresses`, {
+        addresses: newAddresses
       });
-      const data = await res.json();
+      const data = res.data;
       if (data.success) {
         setAddresses(newAddresses);
         setIsEditing(false);
