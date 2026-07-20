@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight, ShieldCheck, Store } from "lucide-react";
 import { toast } from "react-toastify";
 import { signIn, useSession } from "@/lib/auth-client";
 
@@ -18,6 +18,18 @@ export default function LoginPage() {
     window.location.href = role === "admin" ? "/admin" : role === "seller" ? "/seller" : "/";
     return null;
   }
+
+  const handleFillAdmin = () => {
+    setEmail("srs@gmail.com");
+    setPassword("S1234567");
+    toast.info("Admin credentials loaded!");
+  };
+
+  const handleFillSeller = () => {
+    setEmail("shuvo@gmail.com");
+    setPassword("S1234567");
+    toast.info("Seller credentials loaded!");
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,11 +67,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-20 px-6">
-      <div className="w-full max-w-[400px] animate-slide-up">
-        <div className="text-center mb-8">
+    <div className="min-h-[80vh] flex items-center justify-center py-12 px-6">
+      <div className="w-full max-w-[440px] animate-slide-up">
+        <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Welcome back</h1>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">Enter your credentials to access your account.</p>
+        </div>
+
+        {/* Demo Credentials Box */}
+        <div className="mb-6 p-4 rounded-2xl border border-primary-500/30 bg-primary-500/5 dark:bg-primary-500/10 backdrop-blur-xl shadow-sm">
+          <div className="flex items-center gap-2 mb-1.5">
+            <ShieldCheck size={18} className="text-primary-500" />
+            <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">
+              Demo Access Credentials
+            </h3>
+          </div>
+          <p className="text-xs text-neutral-600 dark:text-neutral-300 mb-3 leading-relaxed">
+            If you want to check and test the Admin or Seller dashboard, please use the credentials below:
+          </p>
+          <div className="space-y-2">
+            <div className="p-2.5 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between">
+              <div className="text-xs">
+                <div className="font-semibold text-neutral-900 dark:text-white flex items-center gap-1 mb-0.5">
+                  <ShieldCheck size={13} className="text-emerald-500" /> Admin Account
+                </div>
+                <div className="text-neutral-600 dark:text-neutral-300 font-mono text-[11px]">
+                  Email: <span className="font-semibold text-neutral-900 dark:text-white">srs@gmail.com</span>
+                </div>
+                <div className="text-neutral-600 dark:text-neutral-300 font-mono text-[11px]">
+                  Password: <span className="font-semibold text-neutral-900 dark:text-white">S1234567</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleFillAdmin}
+                className="px-3 py-1.5 text-xs font-medium bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors shadow-sm"
+              >
+                Auto Fill
+              </button>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-white/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between">
+              <div className="text-xs">
+                <div className="font-semibold text-neutral-900 dark:text-white flex items-center gap-1 mb-0.5">
+                  <Store size={13} className="text-amber-500" /> Seller Account
+                </div>
+                <div className="text-neutral-600 dark:text-neutral-300 font-mono text-[11px]">
+                  Email: <span className="font-semibold text-neutral-900 dark:text-white">shuvo@gmail.com</span>
+                </div>
+                <div className="text-neutral-600 dark:text-neutral-300 font-mono text-[11px]">
+                  Password: <span className="font-semibold text-neutral-900 dark:text-white">S1234567</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleFillSeller}
+                className="px-3 py-1.5 text-xs font-medium bg-neutral-800 dark:bg-neutral-700 hover:bg-neutral-900 dark:hover:bg-neutral-600 text-white rounded-lg transition-colors shadow-sm"
+              >
+                Auto Fill
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="card-base p-6 md:p-8 relative overflow-hidden bg-white/70 dark:bg-[#0a0a0a]/70 backdrop-blur-xl">
@@ -155,3 +223,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
