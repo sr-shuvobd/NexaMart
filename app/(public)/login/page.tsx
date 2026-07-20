@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Mail, Lock, ArrowRight, Github } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 import { toast } from "react-toastify";
 import { signIn, useSession } from "@/lib/auth-client";
 
@@ -11,7 +10,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const { data: session } = useSession();
 
   // Redirect if already logged in

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, Eye, RefreshCw, Package } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import api from "@/lib/axios";
@@ -12,7 +12,7 @@ export default function SellerOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!session?.user?.id) return;
     setLoading(true);
     try {
@@ -25,13 +25,13 @@ export default function SellerOrdersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (session?.user?.id) {
       fetchOrders();
     }
-  }, [session]);
+  }, [session?.user?.id, fetchOrders]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TrendingUp, Users, ShoppingBag, DollarSign, MoreHorizontal, ArrowUpRight, ArrowDownRight, RefreshCw } from "lucide-react";
+import { TrendingUp, Users, ShoppingBag, DollarSign, MoreHorizontal, ArrowUpRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/axios";
 import { useSession } from "@/lib/auth-client";
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
               <div className="space-y-6">
                 {recentOrders.length === 0 ? (
                   <div className="text-center py-6 text-neutral-500">No recent sales.</div>
-                ) : recentOrders.map((order: any, i) => (
+                ) : recentOrders.map((order: any, _i) => (
                   <div key={order._id} className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-sm font-bold text-neutral-600 dark:text-neutral-300">
                       {order.customerName ? order.customerName.charAt(0).toUpperCase() : '?'}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Edit2, Trash2, MapPin, Check, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSession } from "@/lib/auth-client";
@@ -23,13 +23,7 @@ export default function AddressManager() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentAddress, setCurrentAddress] = useState<Partial<Address>>({});
   
-  useEffect(() => {
-    if (session?.user?.id) {
-      fetchAddresses();
-    }
-  }, [session?.user?.id]);
-
-  const fetchAddresses = async () => {
+  const fetchAddresses = useCallback(async () => {
     try {
       const res = await api.get(`/api/users/${session?.user?.id}`);
       const data = res.data;
@@ -41,7 +35,13 @@ export default function AddressManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchAddresses();
+    }
+  }, [session?.user?.id, fetchAddresses]);
 
   const saveAddresses = async (newAddresses: Address[]) => {
     try {

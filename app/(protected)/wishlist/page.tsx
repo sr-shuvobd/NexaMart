@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Trash2, ShoppingBag } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useStore } from "@/providers/CartWishlistProvider";
 
 export default function WishlistPage() {

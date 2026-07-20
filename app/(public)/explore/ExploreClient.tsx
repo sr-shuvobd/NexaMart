@@ -4,9 +4,8 @@ import { useState, useMemo } from "react";
 import {
   Search, SlidersHorizontal, X, Star, Heart,
   ChevronDown, Grid2x2, List, Sparkles, Tag,
-  Laptop, Shirt, Home, BookOpen, Dumbbell, Baby, RefreshCw
+  Laptop, Shirt, Home, Dumbbell
 } from "lucide-react";
-import { toast } from "react-toastify";
 import Link from "next/link";
 import { useStore } from "@/providers/CartWishlistProvider";
 

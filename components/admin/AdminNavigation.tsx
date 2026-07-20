@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Menu, X, Sun, Moon, Monitor, MessageSquare } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { LayoutDashboard, ShoppingBag, Users, Settings, LogOut, Package, Menu, X, Sun, Moon, MessageSquare } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useTheme } from "@/providers/ThemeProvider";
 
 export default function AdminNavigation() {
-  const router = useRouter();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = useSession();

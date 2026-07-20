@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Edit, Trash2, Package, RefreshCw } from "lucide-react";
+import { Search, Filter, Edit, Trash2, Package, RefreshCw } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "react-toastify";
 

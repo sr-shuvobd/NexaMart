@@ -1,5 +1,4 @@
-import { Users, Target, Shield, Zap, Globe, Cpu, HeartHandshake, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Target, Shield, Globe, Cpu, HeartHandshake, ArrowRight } from "lucide-react";
 
 const stats = [
   { value: "$50M+", label: "In Processed Sales" },
@@ -49,8 +48,8 @@ export default function AboutPage() {
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
-            {stats.map((s, i) => (
-              <div key={i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            {stats.map((s, _i) => (
+              <div key={_i} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
                 <span className="text-3xl font-bold text-neutral-900 dark:text-white mb-1">{s.value}</span>
                 <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">{s.label}</span>
               </div>
@@ -70,7 +69,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {values.map(({ icon: Icon, title, desc }, i) => (
+            {values.map(({ icon: Icon, title, desc }, _i) => (
               <div key={title} className="group relative p-10 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 overflow-hidden hover:border-primary-500/50 dark:hover:border-primary-500/50 transition-colors duration-500">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
@@ -100,7 +99,7 @@ export default function AboutPage() {
               { name: "David Chen", role: "Chief Technology Officer", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" },
               { name: "Aisha Malik", role: "VP of Artificial Intelligence", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80" },
               { name: "Marcus Reed", role: "Head of Product Design", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" }
-            ].map((member, i) => (
+            ].map((member, _i) => (
               <div key={member.name} className="group cursor-pointer">
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6 bg-neutral-100 dark:bg-neutral-900">
                   <img src={member.img} alt={member.name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />

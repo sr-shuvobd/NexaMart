@@ -68,7 +68,7 @@ export default function CheckoutPage() {
           // Ignore error
         });
     }
-  }, [session?.user?.id, router]);
+  }, [session?.user?.id, session?.user?.name, router]);
 
   const handlePayment = async () => {
     if (!session?.user?.id) {

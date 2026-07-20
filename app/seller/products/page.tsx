@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit, Trash2, Package, RefreshCw } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
@@ -13,7 +13,7 @@ export default function SellerProductsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!session?.user?.id) return;
     setLoading(true);
     try {
@@ -26,13 +26,13 @@ export default function SellerProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]);
 
   useEffect(() => {
     if (session?.user?.id) {
       fetchProducts();
     }
-  }, [session]);
+  }, [session?.user?.id, fetchProducts]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;

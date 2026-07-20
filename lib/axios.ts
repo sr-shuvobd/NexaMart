@@ -17,8 +17,9 @@ api.interceptors.request.use(async (config) => {
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.token) {
-            token = data.token;
-            localStorage.setItem("nexamart_jwt", token);
+            const newToken = String(data.token);
+            token = newToken;
+            localStorage.setItem("nexamart_jwt", newToken);
           }
         }
       } catch (error) {
@@ -45,8 +46,9 @@ api.interceptors.response.use(
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.token) {
-              localStorage.setItem("nexamart_jwt", data.token);
-              originalRequest.headers.Authorization = `Bearer ${data.token}`;
+              const newToken = String(data.token);
+              localStorage.setItem("nexamart_jwt", newToken);
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
               return api(originalRequest);
             }
           }
