@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, RefreshCw, ImagePlus } from "lucide-react";
+import { ArrowLeft, Save, RefreshCw, ImagePlus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useSession } from "@/lib/auth-client";
@@ -20,6 +20,33 @@ export default function SellerAddProductPage() {
   const [image, setImage] = useState("");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
+  const generateAIDescription = () => {
+    if (!name) {
+      toast.error("Please enter a product name first to generate a description.");
+      return;
+    }
+    setIsGeneratingAI(true);
+    
+    // Simulating AI generation based on product name and category
+    setTimeout(() => {
+      const generated = `Introducing the ${name}, the ultimate solution for your ${category} needs. Crafted with premium materials and designed for both durability and elegance, this product seamlessly integrates into your daily lifestyle. \n\nKey Features:\n• State-of-the-art design tailored for modern users.\n• High-performance capabilities delivering unmatched value.\n• Eco-friendly and sustainable construction.\n\nUpgrade your experience today with the ${name} - where innovation meets everyday practicality.`;
+      
+      let index = 0;
+      setDescription("");
+      
+      const interval = setInterval(() => {
+        setDescription((prev) => prev + generated.charAt(index));
+        index++;
+        if (index >= generated.length) {
+          clearInterval(interval);
+          setIsGeneratingAI(false);
+          toast.success("AI description generated successfully!");
+        }
+      }, 10);
+    }, 800);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -204,7 +231,18 @@ export default function SellerAddProductPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Description</label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Description</label>
+                <button 
+                  type="button" 
+                  onClick={generateAIDescription}
+                  disabled={isGeneratingAI}
+                  className="text-xs flex items-center gap-1.5 text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium transition-colors"
+                >
+                  {isGeneratingAI ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                  {isGeneratingAI ? "Generating..." : "Write with AI"}
+                </button>
+              </div>
               <textarea 
                 rows={4}
                 value={description} 
